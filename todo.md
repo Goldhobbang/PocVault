@@ -1,0 +1,11 @@
+- [x] package.json name
+- [x] layout.tsx 메타데이터
+- [x] page.tsx 랜딩
+- [x] login/page.tsx
+- [x] dashboard/layout.tsx 헤더
+- [x] README.md
+- [x] PLANNING.md
+- [x] typecheck 재확인 (0 errors)
+- [x] 작업 순서도 응답
+- [x] auth.ts signIn 콜백에 신규/미설정 계정 → /setup-password 강제 리다이렉트
+- [x] typecheck 재확인 (auth.ts 변경 후, EXIT=0)

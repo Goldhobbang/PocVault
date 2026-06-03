@@ -1,0 +1,29 @@
+# deps
+node_modules/
+.pnp
+.pnp.js
+
+# env
+.env
+.env.local
+.env.*.local
+
+# next
+.next/
+out/
+build/
+
+# prisma
+prisma/dev.db
+prisma/dev.db-journal
+
+# uploads (런타임 생성)
+public/uploads/
+!public/uploads/.gitkeep
+
+# misc
+.DS_Store
+*.pem
+.vercel
+*.tsbuildinfo
+next-env.d.ts
