@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { prismaGoogle } from '@/lib/prisma-google';
+import { prismaCredential } from '@/lib/prisma-credential';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -12,7 +13,6 @@ export const dynamic = 'force-dynamic';
 const UPLOAD_ROOT = join(process.cwd(), 'public', 'uploads');
 
 function encodeRFC5987(filename: string) {
-  // 한글/특수문자 안전 처리
   return encodeURIComponent(filename).replace(/['()]/g, escape).replace(/\*/g, '%2A');
 }
 
@@ -20,22 +20,25 @@ type Ctx = { params: { id: string } };
 
 export async function GET(_req: NextRequest, { params }: Ctx) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  if (!session?.user?.id || !session.user.type) {
     return new Response(JSON.stringify({ success: false, error: { code: 'AUTH_REQUIRED' } }), {
       status: 401,
       headers: { 'content-type': 'application/json' },
     });
   }
-  const userId = session.user.id;
 
-  const file = await prisma.file.findUnique({ where: { id: params.id } });
+  const file =
+    session.user.type === 'google'
+      ? await prismaGoogle.googleFile.findUnique({ where: { id: params.id } })
+      : await prismaCredential.credentialFile.findUnique({ where: { id: params.id } });
+
   if (!file) {
     return new Response(JSON.stringify({ success: false, error: { code: 'NOT_FOUND' } }), {
       status: 404,
       headers: { 'content-type': 'application/json' },
     });
   }
-  if (file.userId !== userId) {
+  if (file.userId !== session.user.id) {
     return new Response(JSON.stringify({ success: false, error: { code: 'FORBIDDEN' } }), {
       status: 403,
       headers: { 'content-type': 'application/json' },
@@ -54,7 +57,6 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
   }
 
   const nodeStream = createReadStream(fullPath);
-  // Next 14: Response에 Web ReadableStream을 넣어야 함. Node Readable → Web 변환
   const { Readable } = await import('node:stream');
   const webStream = Readable.toWeb(nodeStream) as unknown as ReadableStream;
 

@@ -1,19 +1,19 @@
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "GoogleUser" (
     "id" TEXT NOT NULL PRIMARY KEY,
+    "googleId" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
     "image" TEXT,
-    "googleId" TEXT,
-    "passwordHash" TEXT,
     "storageQuota" INTEGER NOT NULL DEFAULT 1073741824,
     "usedStorage" INTEGER NOT NULL DEFAULT 0,
+    "lastLoginAt" DATETIME,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "File" (
+CREATE TABLE "GoogleFile" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "filename" TEXT NOT NULL,
@@ -23,11 +23,11 @@ CREATE TABLE "File" (
     "storagePath" TEXT NOT NULL,
     "description" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "File_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "GoogleFile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "GoogleUser" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
-CREATE TABLE "Text" (
+CREATE TABLE "GoogleText" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -35,23 +35,23 @@ CREATE TABLE "Text" (
     "tags" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Text_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "GoogleText_userId_fkey" FOREIGN KEY ("userId") REFERENCES "GoogleUser" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "GoogleUser_googleId_key" ON "GoogleUser"("googleId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_googleId_key" ON "User"("googleId");
+CREATE UNIQUE INDEX "GoogleUser_email_key" ON "GoogleUser"("email");
 
 -- CreateIndex
-CREATE INDEX "User_email_idx" ON "User"("email");
+CREATE INDEX "GoogleUser_email_idx" ON "GoogleUser"("email");
 
 -- CreateIndex
-CREATE INDEX "User_googleId_idx" ON "User"("googleId");
+CREATE INDEX "GoogleUser_googleId_idx" ON "GoogleUser"("googleId");
 
 -- CreateIndex
-CREATE INDEX "File_userId_createdAt_idx" ON "File"("userId", "createdAt");
+CREATE INDEX "GoogleFile_userId_createdAt_idx" ON "GoogleFile"("userId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "Text_userId_updatedAt_idx" ON "Text"("userId", "updatedAt");
+CREATE INDEX "GoogleText_userId_updatedAt_idx" ON "GoogleText"("userId", "updatedAt");

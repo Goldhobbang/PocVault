@@ -1,0 +1,67 @@
+// =============================================================================
+//  PocVault — Google 인증 전용 DB 스키마
+// =============================================================================
+//  이 스키마는 **오직 Google 로그인 사용자의 데이터**만 보관한다.
+//  id/pw 로그인의 데이터는 prisma/credential.prisma 쪽 DB 에 격리 저장된다.
+//  두 DB 는 파일 자체가 다르며, 어떤 코드도 동시에 두 DB 에 접근하지 않는다.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/google"
+}
+
+datasource googleDb {
+  provider = "sqlite"
+  url      = env("GOOGLE_DATABASE_URL")
+}
+
+/// Google OAuth 로 인증된 사용자 1인 = 1행
+model GoogleUser {
+  id           String   @id @default(cuid())
+  googleId     String   @unique // Google sub
+  email        String   @unique
+  name         String?
+  image        String?
+  storageQuota Int      @default(1073741824) // 1 GiB
+  usedStorage  Int      @default(0)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  files GoogleFile[]
+  texts GoogleText[]
+
+  @@index([email])
+  @@index([googleId])
+}
+
+model GoogleFile {
+  id          String   @id @default(cuid())
+  userId      String
+  filename    String
+  storedName  String
+  mimeType    String
+  size        Int
+  storagePath String
+  description String?
+  createdAt   DateTime @default(now())
+
+  user GoogleUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model GoogleText {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  tags      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user GoogleUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, updatedAt])
+}

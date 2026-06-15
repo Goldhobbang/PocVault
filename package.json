@@ -8,10 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "prisma:generate": "prisma generate --schema prisma/google.prisma && prisma generate --schema prisma/credential.prisma",
+    "prisma:migrate:google": "prisma migrate dev --schema prisma/google.prisma --name init",
+    "prisma:migrate:credential": "prisma migrate dev --schema prisma/credential.prisma --name init",
+    "prisma:migrate": "npm run prisma:migrate:google && npm run prisma:migrate:credential",
+    "prisma:studio:google": "prisma studio --schema prisma/google.prisma",
+    "prisma:studio:credential": "prisma studio --schema prisma/credential.prisma",
+    "postinstall": "npm run prisma:generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.0",
@@ -39,7 +42,7 @@
     "@types/node": "^20.16.11",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.10.4",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.15",
     "postcss": "^8.4.47",

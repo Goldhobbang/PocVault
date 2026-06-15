@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
+/** /main/files — 파일 보관함 */
 export default function FilesPage() {
   const { items, q, setQ, loading, error, upload, update, remove, downloadHref } = useFiles();
   const [quota, setQuota] = useState<{ usedStorage: number; storageQuota: number } | null>(null);
